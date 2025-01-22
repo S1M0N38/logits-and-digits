@@ -1,0 +1,35 @@
+[project]
+name = "logits-and-digits"
+version = "0.1.0"
+description = "Exploring digit generation and their corresponding logits."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "S1M0N38", email = "bertolottosimone@gmail.com" }]
+dependencies = [
+    "numpy>=2.2.1",
+    "openai>=1.59.7",
+    "seaborn>=0.13.2",
+]
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+lint.task-tags = ["FIX", "TODO", "HACK", "WARN", "PERF", "NOTE", "TEST"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "basic"
+
+[tool.commitizen]
+tag_format = "v$major.$minor.$patch$prerelease"
+version_files = ["pyproject.toml"]
+bump_message = "release: $current_version → $new_version"
+update_changelog_on_bump = true
+annotated_tag = true
+gpg_sign = true
+major_version_zero = false
+version_provider = "pep621"
