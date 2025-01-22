@@ -1,1 +1,1 @@
-# logits-and-digits
+# logits & digits
