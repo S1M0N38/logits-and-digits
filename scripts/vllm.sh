@@ -1,5 +1,5 @@
 MODEL="unsloth/Llama-3.3-70B-Instruct-bnb-4bit"
-MAX_MODEL_LEN=128
+MAX_MODEL_LEN=4096
 LOAD_FORMAT="bitsandbytes"
 QUANTIZATION="bitsandbytes"
 
