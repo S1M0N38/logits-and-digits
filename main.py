@@ -14,8 +14,10 @@ MIN_NUMBER = 0
 MAX_NUMBER = 9
 
 PROMPT = (
-    f"Generate a random number between {MIN_NUMBER} and {MAX_NUMBER} (inclusive). "
-    "Only output the number without additional text."
+    "Generate a 5 random numbers between 1 and 100. "
+    "Multiply them togheter and finally compute modulo 10 to obtain a single digit. "
+    "Output the final digit at the end on a new line without additional text. "
+    "Do not write code."
 )
 
 
@@ -30,24 +32,25 @@ def generate_one_completion_and_get_logprobs(
         model=model,
         messages=[{"role": "user", "content": PROMPT}],
         temperature=temperature,
-        max_tokens=8,
         logprobs=True,
         top_logprobs=15,
         n=1,
     )
-    logprobs: dict[int, float] = {i: -float("inf") for i in range(10)}
+    digits_to_logprobs: dict[int, float] = {i: -float("inf") for i in range(10)}
     choice = response.choices[0]
     assert isinstance(choice.logprobs, ChoiceLogprobs)
     assert choice.logprobs.content
     assert choice.logprobs.content[0].top_logprobs
-    for item in choice.logprobs.content[0].top_logprobs:
+    # -1 is token for <|eom_id|>
+    # -2 is the  last token, hopefully the final digit
+    for item in choice.logprobs.content[-2].top_logprobs:
         try:
-            logprob = int(item.token)
-            if logprob in logprobs:
-                logprobs[logprob] = item.logprob
+            digit = int(item.token)
+            if digit in digits_to_logprobs:
+                digits_to_logprobs[digit] = item.logprob
         except ValueError:
-            raise ValueError("Invalid digit")
-    return logprobs
+            pass
+    return digits_to_logprobs
 
 
 def generate_n_completion_and_get_digits(
@@ -62,16 +65,13 @@ def generate_n_completion_and_get_digits(
         model=model,
         messages=[{"role": "user", "content": PROMPT}],
         temperature=temperature,
-        max_tokens=8,
-        logprobs=True,
-        top_logprobs=10,
         n=n,
     )
     digits: list[int] = []
     for choice in response.choices:
         try:
             assert choice.message.content
-            digit = int(choice.message.content)
+            digit = int(choice.message.content[-1])
             digits.append(digit)
         except ValueError:
             raise ValueError("Invalid digit")
